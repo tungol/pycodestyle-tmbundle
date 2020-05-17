@@ -166,7 +166,7 @@ def render_pycodestyle(lines):
     fn_path = os.environ['TM_FILEPATH']
     base_filename = os.path.basename(fn_path)
     messages = parse_lines(fn_path, lines)
-    js_script = os.path.join(TM_BUNDLE_SUPPORT, "txmt_pep8.js")
+    js_script = os.path.join(TM_BUNDLE_SUPPORT, "filter_results.js")
     page_title = "pycodestyle"
     sub_title = "Python style checker"
     render_html_header(page_title, sub_title)
