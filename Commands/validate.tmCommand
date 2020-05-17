@@ -20,9 +20,6 @@ if [ ! -f "$PYCODESTLE" ]; then
         exit
 fi
 
-
-
-
 "$PYCODESTLE" --show-source --show-pep8 --repeat "$TM_FILEPATH" | python3 "$TM_BUNDLE_SUPPORT/render_html.py" 2&gt;/dev/null</string>
 	<key>input</key>
 	<string>document</string>
