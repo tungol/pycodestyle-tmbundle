@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>contactEmailRot13</key>
+	<string></string>
+	<key>contactName</key>
+	<string>Stephen Morton</string>
+	<key>description</key>
+	<string>Validate your Python code with pycodestyle.</string>
+	<key>name</key>
+	<string>pycodestyle</string>
+	<key>uuid</key>
+	<string>22EB3FDF-FA80-4160-A962-5717F7804D3B</string>
+</dict>
+</plist>

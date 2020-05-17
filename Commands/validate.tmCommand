@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/bin/sh
+[[ -f "${TM_SUPPORT_PATH}/lib/bash_init.sh" ]] &amp;&amp; . "${TM_SUPPORT_PATH}/lib/bash_init.sh"
+
+# configuration:
+# set this to the path of pycodestyle
+PYCODESTLE=$(which pycodestyle)
+if [ ! -f "$PYCODESTLE" ]; then
+        PYCODESTLE=/usr/local/bin/pycodestyle
+fi
+
+if [ ! -f "$PYCODESTLE" ]; then
+        echo "pycodestyle not configured"
+        exit
+fi
+
+
+
+
+"$PYCODESTLE" --show-source --show-pep8 --repeat "$TM_FILEPATH" | python3 "$TM_BUNDLE_SUPPORT/render_html.py" 2&gt;/dev/null</string>
+	<key>input</key>
+	<string>document</string>
+	<key>inputFormat</key>
+	<string>text</string>
+	<key>keyEquivalent</key>
+	<string>^@V</string>
+	<key>name</key>
+	<string>Validate with pycodestyle</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>html</string>
+	<key>outputLocation</key>
+	<string>newWindow</string>
+	<key>scope</key>
+	<string>source.python</string>
+	<key>uuid</key>
+	<string>65723076-B757-49E3-9360-0A5FF34C8EE5</string>
+	<key>version</key>
+	<integer>2</integer>
+</dict>
+</plist>
