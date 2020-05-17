@@ -16,7 +16,7 @@ def html_header(title, subtitle):
     script = shlex.quote(f"{TM_SUPPORT_PATH}/lib/webpreview.sh")
     cmd = f'source {script}; html_header "{title}" "{subtitle}"'
     p = subprocess.run(cmd, shell=True, capture_output=True)
-    print(p.stdout.decode('utf-8'))
+    print(p.stdout.decode('utf-8'), end='')
 
 
 def get_js():
@@ -37,7 +37,7 @@ def parse_lines(fn, lines):
             fn, lig, col, txt = line.split(':', maxsplit=3)
             txt_code, txt_msg = txt.strip().split(' ', maxsplit=1)
             message = {'filename': fn, 'line_no': int(lig),
-                       'col': int(col) - 1, 'txt_msg': txt_msg,
+                       'col': int(col), 'txt_msg': txt_msg,
                        'txt_code': txt_code, 'code': [],
                        'pep8': []}
             continue
@@ -51,22 +51,22 @@ def parse_lines(fn, lines):
 
 
 def render_pep(lines):
-    print('                    ', end='')
     doc = ''.join(lines).lstrip('\n').rstrip()
     for line in html.escape(doc).splitlines():
         if line:
+            print('        ', end='')
             print(line)
-        else:
-            print('<br /><br />')
+        print('            <br/>')
 
 
-def render_code(line, col):
-    offset = col
+def render_code(line, offset):
     code_python = line[0].strip('\n')
+    if offset > len(code_python):
+        code_python += ' '
     code_python_formated = ('%s<span class=caret>%s</span>%s' %
-                            (html.escape(code_python[:offset]),
-                             html.escape(code_python[offset:(offset + 1)]),
-                             html.escape(code_python[(offset + 1):])))
+                            (html.escape(code_python[:offset - 1]),
+                             html.escape(code_python[offset - 1:offset]),
+                             html.escape(code_python[offset:])))
     return code_python_formated
 
 
@@ -77,24 +77,23 @@ def render_error(msg, fn):
     col = msg['col']
     txt_msg = msg['txt_msg']
     code_python = render_code(msg['code'], col)
-    print('        ')
-    print(f'            <li class="{txt_code}">')
-    print('                <code><a href="txmt://open/?url=file://', end='')
+    print(f'        <li class="{txt_code}">')
+    print('          <code><a href="txmt://open/?url=file://', end='')
     print(f'{url_file}&line={lig}&column={col}"><b>{lig:4d}</b>:', end='')
     print(f'{col:<3d}</a></code>')
-    print(f'                   <code><i>{txt_code}</i></code> : {txt_msg}')
-    print(f'                <pre class="view_source">{code_python}</pre>')
-    print('                <blockquote class="view_pep">')
+    print(f'          <code><i>{txt_code}</i></code> : {txt_msg}') 
+    print(f'          <pre class="view_source">{code_python}</pre>')
+    print('          <blockquote class="view_pep">')
     render_pep(msg['pep8'])
-    print('                </blockquote>')
-    print('            </li>')
+    print('          </blockquote>')
+    print('        </li>')
 
 
 def render_alternate(messages):
     if not messages:
-        print('                <h2>No error</h2>')
+        print('        <h2>No error</h2>')
         return
-    print('                <ul>')
+    print('        <ul>')
     stats = {}
     for m in messages:
         if m['txt_code'] in stats:
@@ -107,32 +106,29 @@ def render_alternate(messages):
     for code in codes:
         count = stats[code]['count']
         msg = sorted(stats[code]['msg'])[0]
-        print()
-        print('            <li>')
-        print(f'                <code><b>{count:4d}</b>    </code>')
-        print(f'                <code><i>{code}</i></code>')
-        print(f'                : {msg}')
-        print('            </li>')
-        print('            ')
-    print('</ul>')
+        print('          <li>')
+        print(f'            <code><b>{count:4d}</b>    </code>')
+        print(f'            <code><i>{code}</i></code> : {msg}')
+        print('          </li>')
+    print('        </ul>')
 
 
 OPTIONS = """
-        <p style="float:right;">
-            <input type="checkbox" id="view_source" title="view source"
-                onchange="view(this);" checked="checked" /><label
-             for="view_source" title="view source"> view source</label>
-            <input type="checkbox" id="view_pep" title="view PEP"
-                onchange="view(this);" checked="checked" /><label
-             for="view_pep" title="view PEP"> view PEP</label>
-            <br />
-            <label for="filter_codes"
-                title="list of error code to hide">hide :</label>
-            <input type="text" id="filter_codes" value="" size="22"
-                placeholder="list of error code"
-                title="list of error code to hide"
-                onkeyup="update_list();"/>
-        </p>
+      <p style="float:right;">
+        <input type="checkbox" id="view_source" title="view source"
+          onchange="view(this);" checked="checked" />
+        <label for="view_source" title="view source">view source</label>
+        <input type="checkbox" id="view_pep" title="view PEP"
+          onchange="view(this);" checked="checked" />
+        <label for="view_pep" title="view PEP">view PEP</label>
+        <br/>
+        <label for="filter_codes" title="list of error codes to hide">
+          hide:
+        </label>
+        <input type="text" id="filter_codes" value="" size="22"
+          placeholder="list of error code" title="list of error codes to hide"
+          onkeyup="update_list();"/>
+      </p>
 """
 
 
@@ -141,29 +137,25 @@ def main():
     fn = os.path.basename(fn_path)
     lines = sys.stdin.readlines()
     messages = parse_lines(fn_path, lines)
-    page_title = "PEP-8 Python"
+    page_title = "pycodestyle"
     sub_title = "Python style checker"
-    print()
-    print('    ', end='')
     html_header(page_title, sub_title)
-    print(f'        <script src="file://{get_js()}"')
-    print('            type="text/javascript" charset="utf-8">')
-    print('        </script>')
+    print(f'    <script src="file://{get_js()}"')
+    print('      type="text/javascript" charset="utf-8">')
+    print('    </script>')
     print(OPTIONS.strip('\n'))
-    print(f'        <h2>File : {fn}</h2>')
-    print('            <ul>')
+    print(f'      <h2>File: {fn}</h2>')
+    print('      <ul>')
     for m in messages:
         render_error(m, fn_path)
-    print('        ')
-    print("            </ul>")
-    print("            <p>&nbsp;</p>")
-    print('            <div class="alternate">')
+    print("      </ul>")
+    print("      <p>&nbsp;</p>")
+    print('      <div class="alternate">')
     render_alternate(messages)
-    print('            </div>')
-    print('        </div>')
-    print('        </body>')
-    print('        </html>')
-    print('        ', end='')
+    print('      </div>')
+    print('    </div>')
+    print('  </body>')
+    print('</html>')
 
 
 if __name__ == "__main__":
