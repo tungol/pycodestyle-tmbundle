@@ -13,4 +13,4 @@ Installation:
     cd ~/Library/Application\ Support/TextMate/Bundles/
     git clone https://github.com/tungol/pycodestyle-tmbundle "pycodestyle.tmbundle"
 
-[1] https://github.com/ppierre/python-pep8-tmbundle
+[1]: https://github.com/ppierre/python-pep8-tmbundle
